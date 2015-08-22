@@ -18,6 +18,7 @@ def follow(request, base62_id):
         link = Link.objects.get_by_id(base62.to_decimal(base62_id))
     except DecodingError:
         link = Link.objects.filter(custom_url=base62_id)
+        link = link[0]
     if not link:
         raise Http404('No Link found')
     link.usage_count += 1
@@ -36,7 +37,13 @@ def info(request, base62_id):
     """
     View which shows information on a particular link
     """
-    link = Link.objects.get_by_id(base62.to_decimal(base62_id))
+
+    try:
+        link = Link.objects.get_by_id(base62.to_decimal(base62_id))
+    except DecodingError:
+        link = Link.objects.filter(custom_url=base62_id)
+        link = link[0]
+
     if not link:
         raise Http404('No Link found')
     return render(request, 'link_info.html', {'link': link})
@@ -56,9 +63,14 @@ def submit(request):
             try:
                 kwargs.update({'id': base62.to_decimal(custom)})
             except DecodingError:
-                kwargs.update({'id':
-                    base62.to_decimal(custom.encode('utf-8').encode('hex'))})
+                kwargs.update({
+                    'id': base62.to_decimal(custom.encode(
+                        'utf-8').encode('hex')),
+                })
             kwargs.update({'custom_url': custom})
+        link = Link.objects.filter(custom_url=custom)
+        if link:
+            return render(request, 'submit_failed.html', {'link_form': form})
         link = Link.objects.create(**kwargs)
         print link
         return render(request, 'submit_success.html', {'link': link})

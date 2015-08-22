@@ -6,7 +6,6 @@ import requests
 
 from shortener.baseconv import base62
 
-
 class Link(r_models.Model):
     """Model that represents a shortened URL."""
 
@@ -16,7 +15,16 @@ class Link(r_models.Model):
     custom_url = r_models.Attribute(unique=True)
 
     def to_base62(self):
+        if self.custom_url:
+            return self.custom_url.encode('utf-8')
         return base62.from_decimal(int(self.id))
+
+    def validate(self):
+        if self.custom_url:
+            model = self.__class__
+            dups = model.objects.filter(custom_url=self.custom_url)
+            if dups:
+                self._errors.append(('custom_url', 'is duplicate'))
 
     def __unicode__(self):
         return '%s : %s' % (self.to_base62(), self.url)
