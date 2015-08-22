@@ -4,8 +4,9 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_POST
 
 from shortener.baseconv import base62
-from shortener.models import Link
+from shortener.models import Link, LinkAccess
 from shortener.forms import LinkSubmitForm
+from shortener.utils import get_ip_from_request
 
 
 @require_GET
@@ -17,6 +18,12 @@ def follow(request, base62_id):
     link = get_object_or_404(Link, id=base62.to_decimal(base62_id))
     link.usage_count = F('usage_count') + 1
     link.save()
+
+    # write into LinkAccess
+    LinkAccess.objects.create(link=link,
+                              referrer=request.META.get('HTTP_REFERRER'),
+                              ip=get_ip_from_request(request))
+
     return HttpResponsePermanentRedirect(link.url)
 
 
