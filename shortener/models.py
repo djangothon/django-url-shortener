@@ -13,6 +13,7 @@ class Link(r_models.Model):
     url = r_models.Attribute(required=True)
     date_submitted = r_models.DateTimeField(auto_now_add=True)
     usage_count = r_models.IntegerField(default=0, indexed=True)
+    custom_url = r_models.Attribute(unique=True)
 
     def to_base62(self):
         return base62.from_decimal(int(self.id))
@@ -22,7 +23,6 @@ class Link(r_models.Model):
 
 
 class LinkAccess(r_models.Model):
-
     """Model that represents access of a shortened url."""
 
     link = r_models.ReferenceField(Link)

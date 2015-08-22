@@ -1,8 +1,8 @@
 from django.http import HttpResponsePermanentRedirect, Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 
-from shortener.baseconv import base62
+from shortener.baseconv import base62, DecodingError
 from shortener.models import Link, LinkAccess
 from shortener.forms import LinkSubmitForm
 from shortener.utils import get_ip_from_request
@@ -14,7 +14,10 @@ def follow(request, base62_id):
     View which gets the link for the given base62_id value
     and redirects to it.
     """
-    link = Link.objects.get_by_id(base62.to_decimal(base62_id))
+    try:
+        link = Link.objects.get_by_id(base62.to_decimal(base62_id))
+    except DecodingError:
+        link = Link.objects.filter(custom_url=base62_id)
     if not link:
         raise Http404('No Link found')
     link.usage_count += 1
@@ -36,7 +39,7 @@ def info(request, base62_id):
     link = Link.objects.get_by_id(base62.to_decimal(base62_id))
     if not link:
         raise Http404('No Link found')
-    return render(request, 'shortener/link_info.html', {'link': link})
+    return render(request, 'link_info.html', {'link': link})
 
 
 @require_POST
@@ -50,12 +53,17 @@ def submit(request):
         custom = form.cleaned_data['custom']
         if custom:
             # specify an explicit id corresponding to the custom url
-            kwargs.update({'id': base62.to_decimal(custom)})
+            try:
+                kwargs.update({'id': base62.to_decimal(custom)})
+            except DecodingError:
+                kwargs.update({'id':
+                    base62.to_decimal(custom.encode('utf-8').encode('hex'))})
+            kwargs.update({'custom_url': custom})
         link = Link.objects.create(**kwargs)
         print link
-        return render(request, 'shortener/submit_success.html', {'link': link})
+        return render(request, 'submit_success.html', {'link': link})
     else:
-        return render(request, 'shortener/submit_failed.html', {'link_form': form})
+        return render(request, 'submit_failed.html', {'link_form': form})
 
 
 @require_GET
@@ -67,4 +75,4 @@ def index(request):
         'link_form': LinkSubmitForm(),
         'recent_links': Link.objects.all()[:5],
         'most_popular_links': Link.objects.all()[:5]}
-    return render(request, 'shortener/index.html', values)
+    return render(request, 'index.html', values)

@@ -24,10 +24,11 @@ class LinkSubmitForm(forms.Form):
         try:
             id = base62.to_decimal(custom)
         except DecodingError as e:
-            raise forms.ValidationError(e)
+            id = base62.to_decimal(custom.encode('utf-8').encode('hex'))
+        print "ID: ", id
 
         try:
-            if Link.objects.filter(id=id).exists():
+            if Link.objects.get_by_id(id=id):
                 raise forms.ValidationError('"%s" is already taken' % custom)
         except OverflowError:
             raise forms.ValidationError(too_long_error)
