@@ -3,6 +3,7 @@ Utility Methods.
 
 * get_ip_from_request = returns the IP address of remote client.
 """
+import hashlib, os
 
 
 def get_ip_from_request(request):
@@ -18,3 +19,10 @@ def get_ip_from_request(request):
     else:
         ip_addr = request.META.get('REMOTE_ADDR')
     return ip_addr
+
+
+def get_short_url():
+    """
+    Return random string.
+    """
+    return hashlib.md5(os.urandom(20)).hexdigest()[:8]

@@ -6,7 +6,7 @@
 <ul>
   {% for link in recent_links %}
     <li><a href="{% short_url link %}">{{ link.url }}</a> (Count: {{ link.usage_count }})
-    (<a href="{% url info link.to_base62 %}">Info</a>)</li>
+    (<a href="{% url info link.short_url %}">Info</a>)</li>
   {% endfor %}
 </ul>
 
@@ -14,7 +14,7 @@
 <ul>
   {% for link in most_popular_links %}
     <li><a href="{% short_url link %}">{{ link.url }}</a> (Count: {{ link.usage_count }})
-    (<a href="{% url info link.to_base62 %}">Info</a>)</li>
+    (<a href="{% url info link.short_url %}">Info</a>)</li>
   {% endfor %}
 </ul>
 {% endblock content %}

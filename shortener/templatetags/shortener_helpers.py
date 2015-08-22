@@ -8,4 +8,4 @@ def short_url(context, link):
     request = context['request']
     http_host = request.META['HTTP_HOST']
     scheme = request.META['wsgi.url_scheme']
-    return '%s://%s/%s' % (scheme, http_host, link.to_base62())
+    return '%s://%s/%s' % (scheme, http_host, link.short_url)
