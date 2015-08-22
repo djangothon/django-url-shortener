@@ -1,5 +1,4 @@
-from django.db.models import F
-from django.http import HttpResponsePermanentRedirect
+from django.http import HttpResponsePermanentRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_POST
 
@@ -15,8 +14,10 @@ def follow(request, base62_id):
     View which gets the link for the given base62_id value
     and redirects to it.
     """
-    link = get_object_or_404(Link, id=base62.to_decimal(base62_id))
-    link.usage_count = F('usage_count') + 1
+    link = Link.objects.get_by_id(base62.to_decimal(base62_id))
+    if not link:
+        raise Http404('No Link found')
+    link.usage_count += 1
     link.save()
 
     # write into LinkAccess
@@ -32,7 +33,9 @@ def info(request, base62_id):
     """
     View which shows information on a particular link
     """
-    link = get_object_or_404(Link, id=base62.to_decimal(base62_id))
+    link = Link.objects.get_by_id(base62.to_decimal(base62_id))
+    if not link:
+        raise Http404('No Link found')
     return render(request, 'shortener/link_info.html', {'link': link})
 
 
@@ -49,6 +52,7 @@ def submit(request):
             # specify an explicit id corresponding to the custom url
             kwargs.update({'id': base62.to_decimal(custom)})
         link = Link.objects.create(**kwargs)
+        print link
         return render(request, 'shortener/submit_success.html', {'link': link})
     else:
         return render(request, 'shortener/submit_failed.html', {'link_form': form})
@@ -61,6 +65,6 @@ def index(request):
     """
     values = {
         'link_form': LinkSubmitForm(),
-        'recent_links': Link.objects.all().order_by('-date_submitted')[:5],
-        'most_popular_links': Link.objects.all().order_by('-usage_count')[:5]}
+        'recent_links': Link.objects.all()[:5],
+        'most_popular_links': Link.objects.all()[:5]}
     return render(request, 'shortener/index.html', values)

@@ -160,13 +160,8 @@ LOGGING = {
     }
 }
 
-try:
-    from settings_local import *
-except ImportError:
-    pass
-    
 import redisco
 
 redis_host = 'localhost'
 redis_port = '6379'
-redisco.connection_setup(host='localhost', port=6380, db=10)
+redisco.connection_setup(host=redis_host, port=redis_port, db=10)

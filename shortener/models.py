@@ -12,16 +12,13 @@ class Link(r_models.Model):
 
     url = r_models.Attribute(required=True)
     date_submitted = r_models.DateTimeField(auto_now_add=True)
-    usage_count = r_models.PositiveIntegerField(default=0, indexed=True)
+    usage_count = r_models.IntegerField(default=0, indexed=True)
 
     def to_base62(self):
-        return base62.from_decimal(self.id)
+        return base62.from_decimal(int(self.id))
 
     def __unicode__(self):
         return '%s : %s' % (self.to_base62(), self.url)
-
-    class Meta:
-        get_latest_by = 'date_submitted'
 
 
 class LinkAccess(r_models.Model):
@@ -51,7 +48,7 @@ def geotag_link_access(instance, created):
     la = instance
 
     if la.ip:
-        url = 'https//freegeoip.net/json/{0}'.format(urllib2.quote(la.ip))
+        url = 'https://freegeoip.net/json/{0}'.format(urllib2.quote(la.ip))
     else:
         return
     response = requests.get(url)
