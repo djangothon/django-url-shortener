@@ -2,6 +2,7 @@
   <head>
     <title>{% block title %}django-url-shortener{% endblock %}</title>
     {% block extra_head %}{% endblock %}
+    {% block extra_css %}{% endblock %}
   </head>
 
   <body>
@@ -19,5 +20,6 @@
       {% endblock %}
 
     {% block extra_body %}{% endblock %}
+    {% block extra_js %} {% endblock %}
   </body>
 </html>

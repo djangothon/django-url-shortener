@@ -60,11 +60,16 @@ def submit(request):
 
 @require_GET
 def index(request):
-    """
-    View for main page
-    """
+    """View for main page"""
     values = {
         'link_form': LinkSubmitForm(),
         'recent_links': Link.objects.all()[:5],
-        'most_popular_links': Link.objects.all()[:5]}
+        'most_popular_links': Link.objects.all()[:5]
+    }
     return render(request, 'index.html', values)
+
+@require_GET
+def access_map(request):
+    ctx = {}
+    template_name = 'map_box.html'
+    return render(request, template_name, ctx)
