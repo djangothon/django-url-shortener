@@ -1,0 +1,8 @@
+#!/bin/sh
+
+export DB_ENGINE='django.db.backends.sqlite3'
+export DB_NAME='url_shortener.db'
+export DB_USER=''
+export DB_PASSWORD=''
+export DB_HOST=''
+export DB_PORT=''
