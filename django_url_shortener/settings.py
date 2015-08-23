@@ -162,6 +162,6 @@ LOGGING = {
 
 import redisco
 
-redis_host = 'localhost'
-redis_port = '6379'
-redisco.connection_setup(host=redis_host, port=redis_port, db=10)
+REDIS_HOST = 'localhost'
+REDIS_PORT = '6379'
+redisco.connection_setup(host=REDIS_HOST, port=REDIS_PORT, db=10)

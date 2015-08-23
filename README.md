@@ -26,3 +26,23 @@ Features
 * Keeps geolocation information each time URL is followed.
 
 * Keeps origin information each time URL is followed.
+
+
+Dependancies
+------------
+
+* Redis server
+
+* django 1.4
+
+* redisco
+
+* requests
+
+
+How to use
+----------
+
+* add `shortener` to INSTALLED_APPS.
+
+* add `REDIS_HOST` and `REDIS_PORT` to settings.
