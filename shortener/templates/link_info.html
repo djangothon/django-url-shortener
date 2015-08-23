@@ -5,9 +5,26 @@
 
 {% block content %}
 <p>
-<a href="{% short_url link %}">{{ link.url }}</a> (Score: {{ link.usage_count }})
+<a href="{% short_url link %}">{{ link.url }}</a> (Access Count: {{ link.usage_count }})
 <br/>
 <br/>
 Submitted on: {{ link.date_submitted|date:"M d, Y" }}
 </p>
+
+{% if countries %}
+<table border="1">
+    <thead>
+        <th>Country</th>
+        <th>Access Count</th>
+    </thead>
+    <tbody>
+        {% for c in countries %}
+            <tr>
+                <td>{{ c }}</td>
+                <td>{{ countries.c }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
 {% endblock %}

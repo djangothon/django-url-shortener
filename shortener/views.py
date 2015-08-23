@@ -35,7 +35,16 @@ def info(request, short_url):
     link_set = Link.objects.filter(short_url=short_url)
     if link_set:
         link = link_set[0]
-        return render(request, 'link_info.html', {'link': link})
+        access_data = LinkAccess.objects.filter(link_id=link.id)
+        countries = dict()
+        for r in access_data:
+            if r.country in countries:
+                countries[r.country] += 1
+            else:
+                countries[r.country] = 0
+            
+        return render(request, 'link_info.html', 
+                      {'link': link, 'countries': countries})
     else:
         raise Http404('No Link found')
 

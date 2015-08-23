@@ -1,11 +1,13 @@
 <html>
   <head>
     <title>{% block title %}django-url-shortener{% endblock %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     {% block extra_head %}{% endblock %}
     {% block extra_css %}{% endblock %}
   </head>
 
   <body>
+    <div class="container">
       <h1><a href="{% url index %}">{{ request.META.HTTP_HOST }}</a></h1>
       <hr/>
       {% block content %}{% endblock %}
@@ -15,11 +17,10 @@
       {% endblock %}
       {% block bookmarklet %}
       <br/>
-      Bookmarklet (drag this to your bookmarks bar):<br/>
-      <a href="javascript:(function(){var a=window,b=document,c=encodeURIComponent;d=a.open(&#39;//{{ request.META.HTTP_HOST }}/submit/?u=&#39;+c(b.location));})();">Shorten with {{ request.META.HTTP_HOST }}</a>
       {% endblock %}
 
     {% block extra_body %}{% endblock %}
+    </div>
     {% block extra_js %} {% endblock %}
   </body>
 </html>
