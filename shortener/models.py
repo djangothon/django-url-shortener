@@ -4,30 +4,41 @@ import thread
 
 import requests
 
-from shortener.baseconv import base62
+import utils
+
 
 class Link(r_models.Model):
     """Model that represents a shortened URL."""
 
+    short_url = r_models.Attribute(unique=True)
     url = r_models.Attribute(required=True)
     date_submitted = r_models.DateTimeField(auto_now_add=True)
     usage_count = r_models.IntegerField(default=0, indexed=True)
-    custom_url = r_models.Attribute(unique=True)
-
-    def to_base62(self):
-        if self.custom_url:
-            return self.custom_url.encode('utf-8')
-        return base62.from_decimal(int(self.id))
-
-    def validate(self):
-        if self.custom_url:
-            model = self.__class__
-            dups = model.objects.filter(custom_url=self.custom_url)
-            if dups:
-                self._errors.append(('custom_url', 'is duplicate'))
+    is_custom = r_models.BooleanField()
 
     def __unicode__(self):
-        return '%s : %s' % (self.to_base62(), self.url)
+        return '%s : %s' % (self.url, self.short_url)
+
+    def save(self, *args, **kwargs):
+        if hasattr(self, 'id'):
+            super(self.__class__, self).save(*args, **kwargs)
+            return
+
+        if self.is_custom:
+            pass
+        else:
+            self.short_url = utils.get_short_url()
+
+        while True:
+            existing_link = self.__class__.objects.filter(short_url=self.short_url)
+            if existing_link:
+                if self.is_custom:
+                    raise ValueError('Custom url already exists')
+                else:
+                    self.short_url = utils.get_short
+            else:
+                break
+        super(self.__class__, self).save(*args, **kwargs)
 
 
 class LinkAccess(r_models.Model):
